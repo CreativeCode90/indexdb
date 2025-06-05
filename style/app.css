@@ -117,6 +117,23 @@ header {
   }
 }
 
+footer{
+background-color: white;
+display: flex;
+align-items: center;
+position: sticky;
+top: 100%;
+justify-content: space-between;
+padding: 10px;
+.footers{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footers a img{
+  width: 24px;
+}
+}
 @media screen and (max-width:400px) {
   *{
     margin-top: 0;

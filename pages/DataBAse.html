@@ -103,11 +103,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 window.viewDb = (dbName) => {
-  const collectionName = prompt("Enter collection name to view:");
-  if (!collectionName) return;
+  const request = indexedDB.open(dbName);
 
-  window.location.href = `Todo.html?db=${encodeURIComponent(dbName)}&col=${encodeURIComponent(collectionName)}`;
+  request.onsuccess = (event) => {
+    const db = event.target.result;
+    const stores = db.objectStoreNames;
+
+    if (stores.length === 0) {
+      alert("No collections (object stores) found in this database.");
+      return;
+    }
+
+    // Create a list of collections to choose from
+    const collectionArray = Array.from(stores);
+    const choice = prompt(`Choose a collection:\n\n${collectionArray.join("\n")}`);
+    
+    if (choice && collectionArray.includes(choice)) {
+      // Navigate with selected db and collection
+      window.location.href = `Todo.html?db=${encodeURIComponent(dbName)}&col=${encodeURIComponent(choice)}`;
+    } else {
+      alert("Invalid or no collection selected.");
+    }
+
+    db.close();
+  };
+
+  request.onerror = () => {
+    alert("Failed to open database.");
+  };
 };
+
 
   // Delete database
   window.deleteDb = (name, btn) => {
