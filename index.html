@@ -1,187 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="Home.css">
+    <title>Home Create Own Local DataBase</title>
+    <link rel="stylesheet" href="./style/app.css">
+    <link rel="shortcut icon" href="./asset/favicon.ico" type="image/x-icon">
 </head>
-
 <body>
-    <div class="rootContainer">
-        <div class="ip">
-            <input type="text">
-            <button id="addDB">Create DataBase</button>
+    <header>
+        <div class="logo">
+            <img src="./asset/logo.png" alt="LocalDb" title="LocalDb" id="logo" >
         </div>
-        <div class="dbList">
-            <ul>
-               
-            </ul>
+        <div class="menubar">   
+            <a href="">Home</a>
+            <a href="">About</a>
+           
+             <button class="c" >
+                <a href="./pages/DataBAse.html">Create</a>
+             </button>
+           
         </div>
-    </div>
-    <div class="editing">
-        <div class="h">
-            <p>mdatabse </p>
-            <button id="close">close</button>
+    </header>
+    <section class="hercontainer">
+        <h1>Create Your Own Local DataBase</h1>
+        <div class="hlist">
+            <p>Add Note </p>
+            <p>Add Todo List </p>
         </div>
-        <div class="ea">
-            <div class="eai">
-                <input id="collection" class="comin" type="text" placeholder="Enter Collection Name">
-                <button id="collectionadd" >Create</button>
-            </div>
-            <label for="" class="kl">
-                <p>Enter KeyPath</p>
-                <input id="KeyPath" type="text" class="comin" placeholder="Enter Collection Name">
-                <button>add</button>
-            </label>
-            <label for="" class="wa">
-                What you Want to Add ?
-            </label>
-            <label for="" class="walis">
-                <button>Name</button>
-                <button>Multiple Data</button>
-                <button>Todo List</button>
-                <button>Simple List</button>
-            </label>
-            <button class="ok">Ok</button>
+        <div class="hbtn">
+            <a href="./pages/DataBAse.html">
+                <button>Free to Use</button>
+            </a>
         </div>
-    </div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.querySelector("input");
-  const createBtn = document.getElementById("addDB");
-  const dbList = document.querySelector(".dbList ul");
-  const collectionadd = document.getElementById("collectionadd");
-  const collection = document.getElementById("collection");
-  const editing = document.querySelector(".editing");
-  const close = document.getElementById("close");
-  let activeDB = null;
-  let db = null;
-
-  // Load and show saved DBs from localStorage
-  let createdDatabases = JSON.parse(localStorage.getItem("dbNames")) || [];
-  createdDatabases.forEach((dbName) => addDbToList(dbName));
-
-  // Create new DB
-  createBtn.addEventListener("click", () => {
-    const dbName = input.value.trim();
-    if (!dbName) return alert("Enter a database name.");
-    if (createdDatabases.includes(dbName)) return alert("Database already exists.");
-
-    const request = indexedDB.open(dbName, 1);
-    request.onupgradeneeded = (event) => {
-      db = event.target.result;
-      // Initial collection can be skipped or added here
-    };
-    request.onsuccess = () => {
-      db = request.result;
-      createdDatabases.push(dbName);
-      localStorage.setItem("dbNames", JSON.stringify(createdDatabases));
-      addDbToList(dbName);
-      input.value = "";
-    };
-    request.onerror = () => alert("Error creating database");
-  });
-
-  // Add DB to list
-  function addDbToList(name) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <p>${name}</p>
-      <div class="dbac">
-        <button class="editBtn" data-name="${name}">Edit</button>
-        <button onclick="viewDb('${name}', 'data')">View</button>
-        <button onclick="deleteDb('${name}', this)">Delete</button>
-      </div>
-    `;
-    dbList.appendChild(li);
-
-    li.querySelector(".editBtn").addEventListener("click", () => {
-      openEditingPanel(name);
-    });
-  }
-window.viewDb = (dbName) => {
-  const collectionName = prompt("Enter collection name to view:");
-  if (!collectionName) return;
-
-  window.location.href = `Todo.html?db=${encodeURIComponent(dbName)}&col=${encodeURIComponent(collectionName)}`;
-};
-
-  // Delete database
-  window.deleteDb = (name, btn) => {
-    const del = indexedDB.deleteDatabase(name);
-    del.onsuccess = () => {
-      createdDatabases = createdDatabases.filter(db => db !== name);
-      localStorage.setItem("dbNames", JSON.stringify(createdDatabases));
-      btn.closest("li").remove();
-      alert(`Deleted DB: ${name}`);
-    };
-    del.onerror = () => alert("Could not delete DB");
-  };
-
-  // Show editing panel for DB
-  function openEditingPanel(name) {
-    editing.style.visibility = "visible";
-    document.querySelector(".editing .h p").textContent = name;
-    activeDB = name;
-
-    // Open existing DB for collection adding
-    const request = indexedDB.open(activeDB);
-    request.onsuccess = () => {
-      db = request.result;
-    };
-    request.onerror = () => alert("Error opening DB");
-  }
-
-  // Close panel
-  close.addEventListener("click", () => {
-    editing.style.visibility = "hidden";
-  });
-
-  // Create collection
-collectionadd.addEventListener("click", () => {
-    const collectionName = collection.value.trim();
-    if (!collectionName) return alert("Enter collection name");
-
-    // Close current db connection before upgrading
-    if (db) db.close();
-
-    // Step 1: Get current version
-    const versionRequest = indexedDB.open(activeDB);
-    versionRequest.onsuccess = () => {
-        const oldVersion = versionRequest.result.version;
-        versionRequest.result.close();
-
-        // Step 2: Reopen with new version to create object store
-        const upgradeRequest = indexedDB.open(activeDB, oldVersion + 1);
-        
-        upgradeRequest.onupgradeneeded = (event) => {
-            const upgradedDB = event.target.result;
-
-            if (!upgradedDB.objectStoreNames.contains(collectionName)) {
-                upgradedDB.createObjectStore(collectionName, {
-                    keyPath: "id" // or use name, or keep configurable
-                });
-                alert(`Collection "${collectionName}" created in "${activeDB}"`);
-            } else {
-                alert("Collection already exists.");
-            }
-        };
-
-        upgradeRequest.onsuccess = (e) => {
-            db = e.target.result;
-        };
-
-        upgradeRequest.onerror = () => {
-            alert("Failed to upgrade database");
-        };
-    };
-});
-
-});
-</script>
-
+    </section>
 </body>
-
 </html>
