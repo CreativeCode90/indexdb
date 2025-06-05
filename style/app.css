@@ -116,3 +116,23 @@ header {
     color: black;
   }
 }
+
+@media screen and (max-width:400px) {
+  *{
+    margin-top: 0;
+  }
+  header{
+    border-radius: 0px;
+    width: 100%;
+  }
+  .menubar{
+    gap: 0.2rem;
+    a{
+      font-size: 10px;
+      padding: 8px;
+    }
+  }
+  .hercontainer{
+    width: 100%;
+  }
+}

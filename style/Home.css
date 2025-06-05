@@ -184,3 +184,14 @@ body {
     }
   }
 }
+
+
+@media screen and (max-width:400px) {
+  body{
+    align-items: start;
+  }
+  .editing{
+    top: 0%;
+    width: 100%;
+  }
+}

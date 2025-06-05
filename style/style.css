@@ -119,3 +119,14 @@ body{
     font-size: 10px;
     padding-left: 5px;
 }
+
+@media screen and (max-width:400px) {
+    #dbTitle{
+        font-size: 18px;
+    }
+    .list{
+        overflow-y: auto;
+        height: 90%;
+        padding-bottom: 70px;
+    }
+}
